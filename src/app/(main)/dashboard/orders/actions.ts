@@ -1,6 +1,6 @@
 "use server";
 
-import type { Order } from "../_components/schema";
+import type { Order } from "./_components/schema";
 
 // Mock Amazon API response type
 interface AmazonOrder {
