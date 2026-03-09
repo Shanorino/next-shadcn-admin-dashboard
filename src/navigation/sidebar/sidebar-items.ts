@@ -12,6 +12,7 @@ import {
   type LucideIcon,
   Mail,
   MessageSquare,
+  Package,
   ReceiptText,
   ShoppingBag,
   SquareArrowUpRight,
@@ -92,6 +93,12 @@ export const sidebarItems: NavGroup[] = [
     id: 2,
     label: "Pages",
     items: [
+      {
+        title: "Orders",
+        url: "/dashboard/orders",
+        icon: Package,
+        isNew: true,
+      },
       {
         title: "Email",
         url: "/dashboard/coming-soon",
