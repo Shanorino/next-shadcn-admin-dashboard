@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-import { authClient } from "@/lib/auth-client";
+import { signOut } from "@/lib/auth-client";
 
 /**
  * Hook to handle user logout
@@ -13,7 +13,7 @@ export function useLogout() {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
+      await signOut();
       router.push("/auth/v1/login");
       router.refresh();
     } catch (error) {

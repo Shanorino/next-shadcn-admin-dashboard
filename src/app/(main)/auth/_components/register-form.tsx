@@ -12,7 +12,7 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
+import { signUp } from "@/lib/auth-client";
 
 const formSchema = z
   .object({
@@ -43,7 +43,7 @@ export function RegisterForm() {
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
     try {
-      const result = await authClient.signUp.email({
+      const result = await signUp.email({
         email: data.email,
         password: data.password,
         name: data.name,
