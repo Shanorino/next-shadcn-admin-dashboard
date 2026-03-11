@@ -1,5 +1,10 @@
 "use server";
 
+import { and, eq } from "drizzle-orm";
+
+import { db } from "@/db";
+import { order } from "@/db/schema";
+
 import type { Order } from "./_components/schema";
 
 // Mock Amazon API response type
@@ -90,7 +95,7 @@ async function fetchAmazonOrders(_apiKey: string): Promise<AmazonOrder[]> {
 }
 
 // Convert Amazon order to our unified DTO
-function convertAmazonOrderToDTO(amazonOrder: AmazonOrder): Order {
+function convertAmazonOrderToDTO(amazonOrder: AmazonOrder): Omit<Order, "id"> & { id?: string } {
   const addressParts = [
     amazonOrder.ShippingAddress.AddressLine1,
     amazonOrder.ShippingAddress.City,
@@ -99,7 +104,6 @@ function convertAmazonOrderToDTO(amazonOrder: AmazonOrder): Order {
   ];
 
   return {
-    id: crypto.randomUUID(),
     orderId: amazonOrder.AmazonOrderId,
     provider: "Amazon",
     customerName: amazonOrder.BuyerInfo.BuyerName,
@@ -113,7 +117,7 @@ function convertAmazonOrderToDTO(amazonOrder: AmazonOrder): Order {
   };
 }
 
-export async function syncOrdersFromAmazon(): Promise<{ success: boolean; orders?: Order[]; error?: string }> {
+export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?: number; error?: string }> {
   try {
     // Get API key from environment variable
     const apiKey = process.env.AMAZON_SELLER_API_KEY;
@@ -126,18 +130,56 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; orders
     const amazonOrders = await fetchAmazonOrders(apiKey);
 
     // Convert to our unified DTO
-    const orders = amazonOrders.map(convertAmazonOrderToDTO);
+    const orderDTOs = amazonOrders.map(convertAmazonOrderToDTO);
 
-    // TODO: In the future, save orders to database using Prisma
-    // Example:
-    // await prisma.order.createMany({
-    //   data: orders,
-    //   skipDuplicates: true,
-    // });
+    // Upsert orders to database
+    let upsertCount = 0;
+    for (const orderDTO of orderDTOs) {
+      // Check if order exists
+      const existingOrder = await db
+        .select()
+        .from(order)
+        .where(and(eq(order.orderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)))
+        .limit(1);
+
+      if (existingOrder.length > 0) {
+        // Update existing order with data from Amazon API (source of truth)
+        await db
+          .update(order)
+          .set({
+            customerName: orderDTO.customerName,
+            productName: orderDTO.productName,
+            quantity: orderDTO.quantity,
+            totalAmount: orderDTO.totalAmount,
+            orderDate: new Date(orderDTO.orderDate),
+            deliveryStatus: orderDTO.deliveryStatus,
+            shippingAddress: orderDTO.shippingAddress,
+            trackingNumber: orderDTO.trackingNumber,
+            updatedAt: new Date(),
+          })
+          .where(and(eq(order.orderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)));
+      } else {
+        // Insert new order
+        await db.insert(order).values({
+          id: crypto.randomUUID(),
+          orderId: orderDTO.orderId,
+          provider: orderDTO.provider,
+          customerName: orderDTO.customerName,
+          productName: orderDTO.productName,
+          quantity: orderDTO.quantity,
+          totalAmount: orderDTO.totalAmount,
+          orderDate: new Date(orderDTO.orderDate),
+          deliveryStatus: orderDTO.deliveryStatus,
+          shippingAddress: orderDTO.shippingAddress,
+          trackingNumber: orderDTO.trackingNumber || "",
+        });
+      }
+      upsertCount++;
+    }
 
     return {
       success: true,
-      orders,
+      count: upsertCount,
     };
   } catch (error) {
     console.error("Error syncing orders from Amazon:", error);
@@ -145,5 +187,29 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; orders
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",
     };
+  }
+}
+
+export async function getOrders(): Promise<Order[]> {
+  try {
+    const orders = await db.select().from(order).orderBy(order.orderDate);
+
+    // Convert database records to Order type
+    return orders.map((o) => ({
+      id: o.id,
+      orderId: o.orderId,
+      provider: o.provider,
+      customerName: o.customerName,
+      productName: o.productName,
+      quantity: o.quantity,
+      totalAmount: o.totalAmount,
+      orderDate: o.orderDate.toISOString(),
+      deliveryStatus: o.deliveryStatus as "delivered" | "not-delivered",
+      shippingAddress: o.shippingAddress,
+      trackingNumber: o.trackingNumber || "",
+    }));
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    return [];
   }
 }

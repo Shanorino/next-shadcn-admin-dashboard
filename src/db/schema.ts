@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, doublePrecision, integer, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -49,3 +49,26 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
+
+export const order = pgTable(
+  "order",
+  {
+    id: text("id").primaryKey(),
+    orderId: text("orderId").notNull(), // External order ID from provider
+    provider: text("provider").notNull(), // e.g., "Amazon", "eBay", etc.
+    customerName: text("customerName").notNull(),
+    productName: text("productName").notNull(),
+    quantity: integer("quantity").notNull(),
+    totalAmount: doublePrecision("totalAmount").notNull(),
+    orderDate: timestamp("orderDate").notNull(),
+    deliveryStatus: text("deliveryStatus").notNull(), // "delivered" or "not-delivered"
+    shippingAddress: text("shippingAddress").notNull(),
+    trackingNumber: text("trackingNumber"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => ({
+    // Composite unique constraint: orderId + provider must be unique
+    orderProviderUnique: unique().on(table.orderId, table.provider),
+  }),
+);

@@ -7,10 +7,9 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 
-import type { Order } from "../_components/schema";
 import { syncOrdersFromAmazon } from "../actions";
 
-export function SyncOrdersButton({ onSyncSuccess }: { onSyncSuccess: (orders: Order[]) => void }) {
+export function SyncOrdersButton() {
   const [isSyncing, setIsSyncing] = useState(false);
 
   const handleSync = async () => {
@@ -20,9 +19,10 @@ export function SyncOrdersButton({ onSyncSuccess }: { onSyncSuccess: (orders: Or
     toast.promise(syncPromise, {
       loading: "Syncing orders from Amazon...",
       success: (result) => {
-        if (result.success && result.orders) {
-          onSyncSuccess(result.orders);
-          return `Successfully synced ${result.orders.length} new orders!`;
+        if (result.success && result.count !== undefined) {
+          // Refresh the page to show updated orders
+          window.location.reload();
+          return `Successfully synced ${result.count} orders!`;
         }
         throw new Error(result.error || "Failed to sync orders");
       },
