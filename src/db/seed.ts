@@ -1,11 +1,8 @@
-import * as dotenv from "dotenv";
 import { and, eq } from "drizzle-orm";
 
 import data from "../app/(main)/dashboard/orders/_components/data.json";
 import { db } from "./index";
 import { order } from "./schema";
-
-dotenv.config({ path: ".env.local" });
 
 async function seed() {
   console.log("Seeding database with initial order data...");
