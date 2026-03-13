@@ -73,7 +73,7 @@ export const order = pgTable(
   }),
 );
 
-export const shippingShipment = pgTable("shipping_shipments", {
+export const shippingShipment = pgTable("shipping_shipment", {
     id: text("id").primaryKey(),
     order_id: text("order_id").notNull(),
     carrier: text("carrier").notNull(),
@@ -83,7 +83,7 @@ export const shippingShipment = pgTable("shipping_shipments", {
     updated_at: timestamp("updated_at").notNull().defaultNow(),
 })
 
-export const shippingDocument = pgTable("shipping_documents", {
+export const shippingDocument = pgTable("shipping_document", {
     id: text("id").primaryKey(),
     shipment_id: text("shipment_id")
         .notNull()
