@@ -16,6 +16,7 @@ import {
 
 import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
 import type { orderSchema } from "./schema";
+import { ArrangeDeliveryButton } from "./arrange-delivery-button";
 
 export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
   {
@@ -115,6 +116,15 @@ export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
     cell: ({ row }) => (
       <div className="max-w-[150px] truncate text-muted-foreground text-sm">{row.original.trackingNumber || "—"}</div>
     ),
+    enableSorting: false,
+  },
+  {
+    id: "arrangeDelivery",
+    header: "Delivery",
+    cell: ({ row }) => {
+      const order = row.original;
+      return <ArrangeDeliveryButton order={order} />;
+    },
     enableSorting: false,
   },
   {

@@ -4,6 +4,8 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { order } from "@/db/schema";
+import { DeliveryFactory } from "@/server/delivery/DeliveryFactory";
+import type { Carrier, CreateDeliveryOrderParams } from "@/server/delivery/types";
 
 import type { Order } from "./_components/schema";
 
@@ -213,3 +215,79 @@ export async function getOrders(): Promise<Order[]> {
     return [];
   }
 }
+
+export async function arrangeDelivery(
+  orderId: string,
+  carrier: Carrier
+): Promise<{ success: boolean; shipmentNumber?: string; error?: string }> {
+  try {
+    // Fetch the order from database
+    const orderRecord = await db.select().from(order).where(eq(order.id, orderId)).limit(1);
+
+    if (orderRecord.length === 0) {
+      throw new Error("Order not found");
+    }
+
+    const orderData = orderRecord[0];
+
+    // Create delivery service instance using factory
+    const deliveryService = DeliveryFactory.create(carrier);
+
+    // TODO: Implement complex logic to construct CreateDeliveryOrderParams
+    // This should parse the order data and construct the proper delivery parameters
+    // For now, using a placeholder structure
+    const deliveryParams: CreateDeliveryOrderParams = {
+      orderId: orderData.id,
+      sender: {
+        // TODO: Get actual sender information from configuration or database
+        name1: "Your Company Name",
+        street: "Your Street",
+        zipcode: "12345",
+        town: "Your City",
+        country: "D",
+      },
+      receiver: {
+        // TODO: Parse shippingAddress field to extract proper address components
+        // Current shippingAddress is a single string, needs to be parsed
+        name1: orderData.customerName,
+        street: orderData.shippingAddress, // TODO: Extract street from shippingAddress
+        zipcode: "00000", // TODO: Extract zipcode from shippingAddress
+        town: "City", // TODO: Extract town from shippingAddress
+        country: "D", // TODO: Determine country from shippingAddress
+      },
+      parcels: [
+        {
+          weight: 5, // TODO: Calculate weight based on product
+          // TODO: Add dimensions if available
+        },
+      ],
+    };
+
+    // Call the delivery service to create the delivery order
+    // const result = await deliveryService.createDeliveryOrder(deliveryParams);
+
+    // Update order with tracking number if available
+    // if (result.shipmentNumber) {
+    //   await db
+    //     .update(order)
+    //     .set({
+    //       trackingNumber: result.shipmentNumber,
+    //       updatedAt: new Date(),
+    //     })
+    //     .where(eq(order.id, orderId));
+    // }
+
+    return {
+      success: true,
+      shipmentNumber: "GEL_Shipment_0001",//result.shipmentNumber,
+    };
+  } catch (error) {
+    console.error("Error arranging delivery:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
+
