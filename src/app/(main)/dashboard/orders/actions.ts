@@ -139,7 +139,7 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?
       const existingOrder = await db
         .select()
         .from(order)
-        .where(and(eq(order.external_order_id, orderDTO.orderId), eq(order.provider, orderDTO.provider)))
+        .where(and(eq(order.externalOrderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)))
         .limit(1);
 
       if (existingOrder.length > 0) {
@@ -147,31 +147,31 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?
         await db
           .update(order)
           .set({
-            customer_name: orderDTO.customerName,
-            product_name: orderDTO.productName,
+            customerName: orderDTO.customerName,
+            productName: orderDTO.productName,
             quantity: orderDTO.quantity,
-            total_amount: orderDTO.totalAmount,
-            order_date: new Date(orderDTO.orderDate),
-            delivery_status: orderDTO.deliveryStatus,
-            shipping_address: orderDTO.shippingAddress,
-            tracking_number: orderDTO.trackingNumber,
-            updated_at: new Date(),
+            totalAmount: orderDTO.totalAmount,
+            orderDate: new Date(orderDTO.orderDate),
+            deliveryStatus: orderDTO.deliveryStatus,
+            shippingAddress: orderDTO.shippingAddress,
+            trackingNumber: orderDTO.trackingNumber,
+            updatedAt: new Date(),
           })
-          .where(and(eq(order.external_order_id, orderDTO.orderId), eq(order.provider, orderDTO.provider)));
+          .where(and(eq(order.externalOrderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)));
       } else {
         // Insert new order
         await db.insert(order).values({
           id: crypto.randomUUID(),
-          external_order_id: orderDTO.orderId,
+          externalOrderId: orderDTO.orderId,
           provider: orderDTO.provider,
-          customer_name: orderDTO.customerName,
-          product_name: orderDTO.productName,
+          customerName: orderDTO.customerName,
+          productName: orderDTO.productName,
           quantity: orderDTO.quantity,
-          total_amount: orderDTO.totalAmount,
-          order_date: new Date(orderDTO.orderDate),
-          delivery_status: orderDTO.deliveryStatus,
-          shipping_address: orderDTO.shippingAddress,
-          tracking_number: orderDTO.trackingNumber || "",
+          totalAmount: orderDTO.totalAmount,
+          orderDate: new Date(orderDTO.orderDate),
+          deliveryStatus: orderDTO.deliveryStatus,
+          shippingAddress: orderDTO.shippingAddress,
+          trackingNumber: orderDTO.trackingNumber || "",
         });
       }
       upsertCount++;
@@ -192,21 +192,21 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?
 
 export async function getOrders(): Promise<Order[]> {
   try {
-    const orders = await db.select().from(order).orderBy(order.order_date);
+    const orders = await db.select().from(order).orderBy(order.orderDate);
 
     // Convert database records to Order type
     return orders.map((o) => ({
       id: o.id,
-      orderId: o.external_order_id,
+      orderId: o.externalOrderId,
       provider: o.provider,
-      customerName: o.customer_name,
-      productName: o.product_name,
+      customerName: o.customerName,
+      productName: o.productName,
       quantity: o.quantity,
-      totalAmount: o.total_amount,
-      orderDate: o.order_date.toISOString(),
-      deliveryStatus: o.delivery_status as "delivered" | "not-delivered",
-      shippingAddress: o.shipping_address,
-      trackingNumber: o.tracking_number || "",
+      totalAmount: o.totalAmount,
+      orderDate: o.orderDate.toISOString(),
+      deliveryStatus: o.deliveryStatus as "delivered" | "not-delivered",
+      shippingAddress: o.shippingAddress,
+      trackingNumber: o.trackingNumber || "",
     }));
   } catch (error) {
     console.error("Error fetching orders:", error);

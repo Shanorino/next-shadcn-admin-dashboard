@@ -61,9 +61,9 @@ export class GelDeliveryService extends DeliveryService {
         await db.transaction(async (tx) => {
             await tx.insert(shippingShipment).values({
                 id: shipmentId,
-                order_id: orderId,
+                orderId,
                 carrier: "gel",
-                shipment_number: result.shipmentNumber,
+                shipmentNumber: result.shipmentNumber,
             })
 
             for (let i = 0; i < result.labels.length; i++) {
@@ -76,9 +76,9 @@ export class GelDeliveryService extends DeliveryService {
 
                 await tx.insert(shippingDocument).values({
                     id: randomUUID(),
-                    shipment_id: shipmentId,
-                    document_type: "label",
-                    storage_key: filePath,
+                    shipmentId,
+                    documentType: "label",
+                    storageKey: filePath,
                 })
             }
         })

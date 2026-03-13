@@ -18,7 +18,7 @@ async function seed() {
         const existing = await db
           .select()
           .from(order)
-          .where(and(eq(order.external_order_id, orderData.orderId), eq(order.provider, orderData.provider)))
+          .where(and(eq(order.externalOrderId, orderData.orderId), eq(order.provider, orderData.provider)))
           .limit(1);
 
         if (existing.length > 0) {
@@ -29,16 +29,16 @@ async function seed() {
 
         await db.insert(order).values({
           id: orderData.id,
-          external_order_id: orderData.orderId,
+          externalOrderId: orderData.orderId,
           provider: orderData.provider,
-          customer_name: orderData.customerName,
-          product_name: orderData.productName,
+          customerName: orderData.customerName,
+          productName: orderData.productName,
           quantity: orderData.quantity,
-          total_amount: orderData.totalAmount,
-          order_date: new Date(orderData.orderDate),
-          delivery_status: orderData.deliveryStatus,
-          shipping_address: orderData.shippingAddress,
-          tracking_number: orderData.trackingNumber || "",
+          totalAmount: orderData.totalAmount,
+          orderDate: new Date(orderData.orderDate),
+          deliveryStatus: orderData.deliveryStatus,
+          shippingAddress: orderData.shippingAddress,
+          trackingNumber: orderData.trackingNumber || "",
         });
         console.log(`  ✓ Inserted order: ${orderData.orderId}`);
         inserted++;
