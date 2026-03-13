@@ -52,18 +52,18 @@ describe("GEL API integration", () => {
         expect(result.shipmentNumber).toBe("TEST123456")
 
         const shipment = await db.query.shippingShipment.findFirst({
-            where: (s, { eq }) => eq(s.shipmentNumber, "TEST123456"),
+            where: (s, { eq }) => eq(s.shipment_number, "TEST123456"),
         })
 
         expect(shipment).not.toBeNull()
 
         const document = await db.query.shippingDocument.findFirst({
-            where: (d, { eq }) => eq(d.shipmentId, shipment!.id),
+            where: (d, { eq }) => eq(d.shipment_id, shipment!.id),
         })
 
         expect(document).not.toBeNull()
 
-        const filePath = document!.storageKey
+        const filePath = document!.storage_key
 
         const file = await readFile(filePath)
 
