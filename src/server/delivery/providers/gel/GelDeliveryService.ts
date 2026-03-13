@@ -5,12 +5,22 @@ import {
 } from "../../types"
 
 import { GelConfig } from "./types"
+import { mkdir, writeFile } from "node:fs/promises"
+import {randomUUID} from "node:crypto";
+import {db} from "@/db";
+import {shippingDocument, shippingShipment} from "@/db/schema";
+import path from "node:path";
 
 export class GelDeliveryService extends DeliveryService {
     private readonly baseUrl =
         "https://www.service.equicon.de/gel/api/import"
 
-    private fetcher: typeof fetch
+    private readonly fetcher: typeof fetch
+
+    private storageDir = path.resolve(
+        process.cwd(),
+        "storage/shipping-labels"
+    )
 
     constructor(
         private config: GelConfig,
@@ -25,9 +35,7 @@ export class GelDeliveryService extends DeliveryService {
     ): Promise<DeliveryResult> {
         const url = this.buildUrl(params)
 
-        const response = await this.fetcher(url, {
-            method: "GET",
-        })
+        const response = await this.fetcher(url, { method: "GET" })
 
         if (!response.ok) {
             throw new Error(`GEL request failed ${response.status}`)
@@ -35,7 +43,45 @@ export class GelDeliveryService extends DeliveryService {
 
         const xml = await response.text()
 
-        return this.parseResponse(xml)
+        const result = this.parseResponse(xml)
+
+        await this.persistShipment(params.orderId, result)
+
+        return result
+    }
+
+    private async persistShipment(
+        orderId: string,
+        result: DeliveryResult
+    ) {
+        await mkdir(this.storageDir, { recursive: true })
+
+        const shipmentId = randomUUID()
+
+        await db.transaction(async (tx) => {
+            await tx.insert(shippingShipment).values({
+                id: shipmentId,
+                orderId,
+                carrier: "gel",
+                shipmentNumber: result.shipmentNumber,
+            })
+
+            for (let i = 0; i < result.labels.length; i++) {
+                const label = result.labels[i]
+
+                const fileName = `gel_${result.shipmentNumber}_${i + 1}.pdf`
+                const filePath = path.join(this.storageDir, fileName)
+
+                await writeFile(filePath, label.data)
+
+                await tx.insert(shippingDocument).values({
+                    id: randomUUID(),
+                    shipmentId,
+                    documentType: "label",
+                    storageKey: filePath,
+                })
+            }
+        })
     }
 
     private buildUrl(params: CreateDeliveryOrderParams): string {
@@ -82,7 +128,7 @@ export class GelDeliveryService extends DeliveryService {
             parcel.length ?? "",
             parcel.width ?? "",
             parcel.height ?? "",
-            parcel.description ?? ""
+            parcel.description ?? "",
         ].join("|")
     }
 
@@ -94,7 +140,7 @@ export class GelDeliveryService extends DeliveryService {
         }
 
         const labelMatches = [
-            ...xml.matchAll(/<labeldata>(.*?)<\/labeldata>/g)
+            ...xml.matchAll(/<labeldata>(.*?)<\/labeldata>/g),
         ]
 
         const labels = labelMatches.map((m) => ({

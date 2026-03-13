@@ -72,3 +72,24 @@ export const order = pgTable(
     orderProviderUnique: unique().on(table.orderId, table.provider),
   }),
 );
+
+export const shippingShipment = pgTable("shipping_shipments", {
+    id: text("id").primaryKey(),
+    orderId: text("orderId").notNull(),
+    carrier: text("carrier").notNull(),
+    shipmentNumber: text("shipmentNumber").notNull().unique(),
+    status: text("status").notNull().default("created"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+})
+
+export const shippingDocument = pgTable("shipping_documents", {
+    id: text("id").primaryKey(),
+    shipmentId: text("shipmentId")
+        .notNull()
+        .references(() => shippingShipment.id, { onDelete: "cascade" }),
+    documentType: text("documentType").notNull(), // "label"
+    storageKey: text("storageKey").notNull(), // path to stored file
+    mimeType: text("mimeType").notNull().default("application/pdf"),
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+})

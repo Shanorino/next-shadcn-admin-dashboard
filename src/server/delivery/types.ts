@@ -14,6 +14,7 @@ export interface DeliveryServiceConfig {
 }
 
 export interface CreateDeliveryOrderParams {
+    orderId: string
     sender: Address
     receiver: Address
     parcels: Parcel[]
