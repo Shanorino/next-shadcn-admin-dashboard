@@ -7,7 +7,7 @@ const mockPdfBase64 =
 
 const mockXml = `
 <response>
-  <snr>TEST123456</snr>
+  <snr>GEL_TRACKING_NUMBER_0001</snr>
   <labeldata>${mockPdfBase64}</labeldata>
 </response>
 `
@@ -52,7 +52,7 @@ describe("GEL API integration", () => {
         expect(result.shipmentNumber).toBe("TEST123456")
 
         const shipment = await db.query.shippingShipment.findFirst({
-            where: (s, { eq }) => eq(s.shipmentNumber, "TEST123456"),
+            where: (s, { eq }) => eq(s.shipmentNumber, "GEL_TRACKING_NUMBER_0001"),
         })
 
         expect(shipment).not.toBeNull()

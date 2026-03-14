@@ -8,8 +8,9 @@ import { GelConfig } from "./types"
 import { mkdir, writeFile } from "node:fs/promises"
 import {randomUUID} from "node:crypto";
 import {db} from "@/db";
-import {shippingDocument, shippingShipment} from "@/db/schema";
+import {order, shippingDocument, shippingShipment} from "@/db/schema";
 import path from "node:path";
+import {eq} from "drizzle-orm";
 
 export class GelDeliveryService extends DeliveryService {
     private readonly baseUrl =
@@ -59,6 +60,7 @@ export class GelDeliveryService extends DeliveryService {
         const shipmentId = randomUUID()
 
         await db.transaction(async (tx) => {
+            // Update shipment info
             await tx.insert(shippingShipment).values({
                 id: shipmentId,
                 orderId,
@@ -81,6 +83,16 @@ export class GelDeliveryService extends DeliveryService {
                     storageKey: filePath,
                 })
             }
+
+            // Update order info
+            await tx
+                .update(order)
+                .set({
+                    trackingNumber: result.shipmentNumber,
+                    deliveryStatus: "delivered",
+                    updatedAt: new Date(),
+                })
+                .where(eq(order.id, orderId))
         })
     }
 
