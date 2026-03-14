@@ -267,20 +267,10 @@ export async function arrangeDelivery(
     // Call the delivery service to create the delivery order
     // const result = await deliveryService.createDeliveryOrder(deliveryParams);
 
-    // Update order with tracking number if available
-    // if (result.shipmentNumber) {
-    //   await db
-    //     .update(order)
-    //     .set({
-    //       trackingNumber: result.shipmentNumber,
-    //       updatedAt: new Date(),
-    //     })
-    //     .where(eq(order.id, orderId));
-    // }
 
     return {
       success: true,
-      shipmentNumber: "GEL_Shipment_0001",//result.shipmentNumber,
+      shipmentNumber: "GEL_TRACKING_0001",//result.shipmentNumber,
     };
   } catch (error) {
     console.error("Error arranging delivery:", error);

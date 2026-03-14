@@ -39,11 +39,11 @@ export class GelDeliveryService extends DeliveryService {
         const response = await this.fetcher(url, { method: "GET" })
 
         if (!response.ok) {
+            console.info("GEL API error response:", response)
             throw new Error(`GEL request failed ${response.status}`)
         }
-
         const xml = await response.text()
-
+        console.log("Successfully created GEL delivery:", xml)
         const result = this.parseResponse(xml)
 
         await this.persistShipment(params.orderId, result)
