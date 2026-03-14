@@ -3,9 +3,10 @@
 import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { order } from "@/db/schema";
+import { order, shippingShipment, shippingDocument } from "@/db/schema";
 import { DeliveryFactory } from "@/server/delivery/DeliveryFactory";
 import type { Carrier, CreateDeliveryOrderParams } from "@/server/delivery/types";
+import { resolveStorageKeyToUrl, extractFilenameFromStorageKey } from "@/lib/storage";
 
 import type { Order } from "./_components/schema";
 
@@ -283,6 +284,56 @@ export async function arrangeDelivery(
     };
   } catch (error) {
     console.error("Error arranging delivery:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
+}
+
+export async function downloadDeliveryLabel(
+  orderId: string
+): Promise<{ success: boolean; fileUrl?: string; fileName?: string; error?: string }> {
+  try {
+    // Find the shipment for this order
+    const shipmentRecord = await db
+      .select()
+      .from(shippingShipment)
+      .where(eq(shippingShipment.orderId, orderId))
+      .limit(1);
+
+    if (shipmentRecord.length === 0) {
+      throw new Error("No shipment found for this order");
+    }
+
+    const shipment = shipmentRecord[0];
+
+    // Find the shipping document (label) for this shipment
+    const documentRecord = await db
+      .select()
+      .from(shippingDocument)
+      .where(eq(shippingDocument.shipmentId, shipment.id))
+      .limit(1);
+
+    if (documentRecord.length === 0) {
+      throw new Error("No delivery label found for this shipment");
+    }
+
+    const document = documentRecord[0];
+
+    // Use storage utility to resolve storage key to URL
+    // This allows easy migration to cloud storage in the future
+    const fileUrl = resolveStorageKeyToUrl(document.storageKey);
+    const filename = extractFilenameFromStorageKey(document.storageKey);
+    const fileName = `label-${shipment.shipmentNumber}.pdf`;
+
+    return {
+      success: true,
+      fileUrl,
+      fileName,
+    };
+  } catch (error) {
+    console.error("Error downloading delivery label:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Unknown error occurred",

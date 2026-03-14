@@ -17,6 +17,7 @@ import {
 import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
 import type { orderSchema } from "./schema";
 import { ArrangeDeliveryButton } from "./arrange-delivery-button";
+import { DownloadDeliveryLabelButton } from "./download-delivery-label-button";
 
 export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
   {
@@ -123,6 +124,11 @@ export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
     header: "Delivery",
     cell: ({ row }) => {
       const order = row.original;
+
+      if (order.deliveryStatus === "delivered") {
+        return <DownloadDeliveryLabelButton order={order} />;
+      }
+
       return <ArrangeDeliveryButton order={order} />;
     },
     enableSorting: false,

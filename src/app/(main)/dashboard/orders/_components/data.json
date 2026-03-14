@@ -23,7 +23,7 @@
     "orderDate": "2026-03-06T14:20:00Z",
     "deliveryStatus": "not-delivered",
     "shippingAddress": "456 Oak Ave, Los Angeles, CA 90001",
-    "trackingNumber": "1Z999AA10123456785"
+    "trackingNumber": ""
   },
   {
     "id": "3",
@@ -62,7 +62,7 @@
     "orderDate": "2026-03-08T11:30:00Z",
     "deliveryStatus": "not-delivered",
     "shippingAddress": "555 Maple Dr, Austin, TX 78701",
-    "trackingNumber": "1Z999AA10123456787"
+    "trackingNumber": ""
   },
   {
     "id": "6",
