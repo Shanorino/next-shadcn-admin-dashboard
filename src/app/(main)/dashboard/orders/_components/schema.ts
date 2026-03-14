@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const orderSchema = z.object({
   id: z.string(),
-  orderId: z.string(),
+  externalOrderId: z.string(),
   provider: z.string(), // e.g., "Amazon", "eBay", etc.
   customerName: z.string(),
   productName: z.string(),

@@ -18,18 +18,18 @@ async function seed() {
         const existing = await db
           .select()
           .from(order)
-          .where(and(eq(order.externalOrderId, orderData.orderId), eq(order.provider, orderData.provider)))
+          .where(and(eq(order.externalOrderId, orderData.externalOrderId), eq(order.provider, orderData.provider)))
           .limit(1);
 
         if (existing.length > 0) {
-          console.log(`  Skipping existing order: ${orderData.orderId}`);
+          console.log(`  Skipping existing order: ${orderData.externalOrderId}`);
           skipped++;
           continue;
         }
 
         await db.insert(order).values({
           id: orderData.id,
-          externalOrderId: orderData.orderId,
+          externalOrderId: orderData.externalOrderId,
           provider: orderData.provider,
           customerName: orderData.customerName,
           productName: orderData.productName,
@@ -40,10 +40,10 @@ async function seed() {
           shippingAddress: orderData.shippingAddress,
           trackingNumber: orderData.trackingNumber || "",
         });
-        console.log(`  ✓ Inserted order: ${orderData.orderId}`);
+        console.log(`  ✓ Inserted order: ${orderData.externalOrderId}`);
         inserted++;
       } catch (err) {
-        console.error(`  ✗ Failed to insert order ${orderData.orderId}:`, err instanceof Error ? err.message : err);
+        console.error(`  ✗ Failed to insert order ${orderData.externalOrderId}:`, err instanceof Error ? err.message : err);
       }
     }
 

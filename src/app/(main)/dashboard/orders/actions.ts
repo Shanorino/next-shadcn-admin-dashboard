@@ -106,7 +106,7 @@ function convertAmazonOrderToDTO(amazonOrder: AmazonOrder): Omit<Order, "id"> & 
   ];
 
   return {
-    orderId: amazonOrder.AmazonOrderId,
+    externalOrderId: amazonOrder.AmazonOrderId,
     provider: "Amazon",
     customerName: amazonOrder.BuyerInfo.BuyerName,
     productName: amazonOrder.OrderItems.map((item) => item.Title).join(", "),
@@ -141,7 +141,7 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?
       const existingOrder = await db
         .select()
         .from(order)
-        .where(and(eq(order.externalOrderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)))
+        .where(and(eq(order.externalOrderId, orderDTO.externalOrderId), eq(order.provider, orderDTO.provider)))
         .limit(1);
 
       if (existingOrder.length > 0) {
@@ -159,12 +159,12 @@ export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?
             trackingNumber: orderDTO.trackingNumber,
             updatedAt: new Date(),
           })
-          .where(and(eq(order.externalOrderId, orderDTO.orderId), eq(order.provider, orderDTO.provider)));
+          .where(and(eq(order.externalOrderId, orderDTO.externalOrderId), eq(order.provider, orderDTO.provider)));
       } else {
         // Insert new order
         await db.insert(order).values({
           id: crypto.randomUUID(),
-          externalOrderId: orderDTO.orderId,
+          externalOrderId: orderDTO.externalOrderId,
           provider: orderDTO.provider,
           customerName: orderDTO.customerName,
           productName: orderDTO.productName,
@@ -199,7 +199,7 @@ export async function getOrders(): Promise<Order[]> {
     // Convert database records to Order type
     return orders.map((o) => ({
       id: o.id,
-      orderId: o.externalOrderId,
+      externalOrderId: o.externalOrderId,
       provider: o.provider,
       customerName: o.customerName,
       productName: o.productName,

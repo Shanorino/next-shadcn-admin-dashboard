@@ -35,7 +35,7 @@ export function ArrangeDeliveryButton({ order }: ArrangeDeliveryButtonProps) {
         if (result.success && result.shipmentNumber) {
           // Optionally refresh the page or update the UI
           // window.location.reload();
-          return `Delivery arranged! Shipment number: ${result.shipmentNumber}`;
+          return `Delivery arranged for order ${order.externalOrderId}! Shipment number: ${result.shipmentNumber}`;
         }
         throw new Error(result.error || "Failed to arrange delivery");
       },
