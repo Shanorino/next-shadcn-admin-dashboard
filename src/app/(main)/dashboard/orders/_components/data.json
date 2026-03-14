@@ -1,7 +1,7 @@
 [
   {
     "id": "1",
-    "orderId": "AMZ-2026-001234",
+    "externalOrderId": "AMZ-2026-001234",
     "provider": "Amazon",
     "customerName": "John Smith",
     "productName": "Wireless Headphones",
@@ -14,7 +14,7 @@
   },
   {
     "id": "2",
-    "orderId": "AMZ-2026-001235",
+    "externalOrderId": "AMZ-2026-001235",
     "provider": "Amazon",
     "customerName": "Sarah Johnson",
     "productName": "Coffee Maker",
@@ -27,7 +27,7 @@
   },
   {
     "id": "3",
-    "orderId": "AMZ-2026-001236",
+    "externalOrderId": "AMZ-2026-001236",
     "provider": "Amazon",
     "customerName": "Michael Chen",
     "productName": "Laptop Stand",
@@ -40,7 +40,7 @@
   },
   {
     "id": "4",
-    "orderId": "AMZ-2026-001237",
+    "externalOrderId": "AMZ-2026-001237",
     "provider": "Amazon",
     "customerName": "Emily Davis",
     "productName": "Phone Case",
@@ -53,7 +53,7 @@
   },
   {
     "id": "5",
-    "orderId": "AMZ-2026-001238",
+    "externalOrderId": "AMZ-2026-001238",
     "provider": "Amazon",
     "customerName": "David Wilson",
     "productName": "USB Cable",
@@ -66,7 +66,7 @@
   },
   {
     "id": "6",
-    "orderId": "AMZ-2026-001239",
+    "externalOrderId": "AMZ-2026-001239",
     "provider": "Amazon",
     "customerName": "Lisa Anderson",
     "productName": "Bluetooth Speaker",
@@ -79,7 +79,7 @@
   },
   {
     "id": "7",
-    "orderId": "AMZ-2026-001240",
+    "externalOrderId": "AMZ-2026-001240",
     "provider": "Amazon",
     "customerName": "Robert Brown",
     "productName": "Gaming Mouse",
@@ -92,7 +92,7 @@
   },
   {
     "id": "8",
-    "orderId": "AMZ-2026-001241",
+    "externalOrderId": "AMZ-2026-001241",
     "provider": "Amazon",
     "customerName": "Jennifer Garcia",
     "productName": "Water Bottle",

@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { DataTableColumnHeader } from "../../../../../components/data-table/data-table-column-header";
+import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import type { orderSchema } from "./schema";
 import { ArrangeDeliveryButton } from "./arrange-delivery-button";
 import { DownloadDeliveryLabelButton } from "./download-delivery-label-button";
@@ -44,9 +44,9 @@ export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "orderId",
+    accessorKey: "externalOrderId",
     header: ({ column }) => <DataTableColumnHeader column={column} title="Order ID" />,
-    cell: ({ row }) => <div className="font-medium">{row.original.orderId}</div>,
+    cell: ({ row }) => <div className="font-medium">{row.original.externalOrderId}</div>,
     enableSorting: true,
   },
   {
@@ -147,7 +147,7 @@ export const ordersColumns: ColumnDef<z.infer<typeof orderSchema>>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(order.orderId)}>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(order.externalOrderId)}>
               Copy Order ID
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(order.trackingNumber || "")}>
