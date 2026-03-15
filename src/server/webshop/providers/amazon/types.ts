@@ -1,3 +1,5 @@
+import { OrderStatus } from "amazon-sp-api/lib/typings/operations/orders";
+
 export interface AmazonConfig {
     refreshToken: string
     region?: "eu" | "na" | "fe"
@@ -14,7 +16,7 @@ export interface AmazonOrder {
         Amount: string
         CurrencyCode: string
     }
-    ShipmentStatus: string
+    ShipmentStatus: OrderStatus
     ShippingAddress: {
         Name: string
         AddressLine1: string

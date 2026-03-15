@@ -60,7 +60,7 @@ export class AmazonWebShopService extends WebShopService {
                 PurchaseDate: "2026-03-09T14:30:00Z",
                 BuyerInfo: { BuyerName: "Alice Thompson" },
                 OrderTotal: { Amount: "129.99", CurrencyCode: "USD" },
-                ShipmentStatus: "Not-Delivered",
+                ShipmentStatus: "Unshipped",
                 ShippingAddress: {
                     Name: "Alice Thompson",
                     AddressLine1: "742 Evergreen Terrace",
@@ -94,8 +94,7 @@ export class AmazonWebShopService extends WebShopService {
             totalAmount: parseFloat(order.OrderTotal.Amount),
             orderDate: order.PurchaseDate,
             deliveryStatus:
-                // TODO: check amazon type if it's really called "Delivered" or "Not-Delivered"
-                order.ShipmentStatus === "Delivered"
+                order.ShipmentStatus === "Shipped"
                     ? "delivered"
                     : "not-delivered",
             shippingAddress: address,
