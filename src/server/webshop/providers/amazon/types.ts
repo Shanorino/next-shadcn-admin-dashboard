@@ -1,3 +1,9 @@
+export interface AmazonConfig {
+    refreshToken: string
+    region?: "eu" | "na" | "fe"
+    sandbox?: boolean
+}
+
 export interface AmazonOrder {
     AmazonOrderId: string
     PurchaseDate: string

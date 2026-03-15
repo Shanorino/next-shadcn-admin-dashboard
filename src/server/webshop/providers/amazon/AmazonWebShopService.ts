@@ -1,12 +1,31 @@
-import { AmazonOrder } from "./types"
+import {AmazonConfig, AmazonOrder} from "./types"
+import { SellingPartner } from "amazon-sp-api"
 import { WebShopOrderDTO, WebShopService } from "@/server/webshop/WebShopService";
 
 export class AmazonWebShopService extends WebShopService {
+    private spClient: SellingPartner
 
-    constructor(
-        private apiKey: string,
-    ) {
+    constructor(private config: AmazonConfig) {
         super()
+
+        this.spClient = new SellingPartner({
+            region: config.region ?? "eu",
+
+            refresh_token: config.refreshToken,
+
+            credentials: {
+                SELLING_PARTNER_APP_CLIENT_ID:
+                    process.env.SELLING_PARTNER_APP_CLIENT_ID!,
+
+                SELLING_PARTNER_APP_CLIENT_SECRET:
+                    process.env.SELLING_PARTNER_APP_CLIENT_SECRET!
+            },
+
+            options: {
+                use_sandbox: config.sandbox ?? false,
+                debug_log: true,
+            }
+        })
     }
 
     async fetchOrders(): Promise<WebShopOrderDTO[]> {
@@ -15,8 +34,24 @@ export class AmazonWebShopService extends WebShopService {
         return amazonOrders.map(this.convertOrder)
     }
 
-    // TODO: use Amazon SP-API client (amazon-sp-api) to fetch real orders
-    private async fetchAmazonOrders(): Promise<AmazonOrder[]> {
+    private async fetchAmazonOrders(): Promise<any[]> {
+
+        const res = await this.spClient.callAPI({
+            endpoint: "orders",
+            operation: "getOrders",
+
+            query: {
+                MarketplaceIds: ["A1PA6795UKMFR9"], // Germany
+                CreatedAfter: new Date(
+                    Date.now() - 7 * 24 * 3600 * 1000
+                ).toISOString(),
+            }
+        })
+
+        return res?.payload?.Orders ?? []
+    }
+
+    private async fetchAmazonOrdersMocked(): Promise<AmazonOrder[]> {
         await new Promise((resolve) => setTimeout(resolve, 1500))
 
         return [

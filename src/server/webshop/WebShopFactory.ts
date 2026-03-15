@@ -10,13 +10,15 @@ export class WebShopFactory {
         switch (provider) {
 
             case "amazon":
-                if (!process.env.AMAZON_SELLER_API_KEY) {
+                if (!process.env.AMAZON_SP_REFRESH_TOKEN) {
                     throw new Error("Amazon Seller API key not configured");
                 }
 
-                return new AmazonWebShopService(
-                    process.env.AMAZON_SELLER_API_KEY!
-                )
+                return new AmazonWebShopService({
+                    region: "eu",
+                    refreshToken: process.env.AMAZON_SP_REFRESH_TOKEN!,
+                    sandbox: process.env.AMAZON_SELLER_API_SANDBOX === "true"
+                })
 
             default:
                 throw new Error(`Unsupported webshop provider: ${provider}`)
