@@ -46,7 +46,7 @@ describe("GEL API integration", () => {
                 town: "Munich",
                 country: "D",
             },
-            parcels: [{ weight: 5 }],
+            parcels: [{ weight: 5, description: "Box 1" }, {weight: 25, description: "Box 2"}, {length: 10, width: 20, height: 30, description: "Box 3"}],
         })
 
         expect(result.shipmentNumber).toBe("TEST123456")
