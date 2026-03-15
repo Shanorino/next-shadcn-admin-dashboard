@@ -4,12 +4,12 @@ import { and, eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { order, shippingShipment, shippingDocument } from "@/db/schema";
-import { DeliveryFactory } from "@/server/delivery/DeliveryFactory";
+import { DeliveryFactory } from "@/server/delivery/delivery-factory";
 import type { Carrier, CreateDeliveryOrderParams } from "@/server/delivery/types";
 import { resolveStorageKeyToUrl, extractFilenameFromStorageKey } from "@/lib/storage";
 
 import type { Order } from "./_components/schema";
-import {WebShopFactory} from "@/server/webshop/WebShopFactory";
+import {WebShopFactory} from "@/server/webshop/web-shop-factory";
 
 export async function syncOrdersFromAmazon(): Promise<{ success: boolean; count?: number; error?: string }> {
   try {

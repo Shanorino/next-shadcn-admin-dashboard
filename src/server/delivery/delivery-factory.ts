@@ -1,6 +1,6 @@
-import { DeliveryService } from "./DeliveryService"
+import { DeliveryService } from "./delivery-service"
 import { Carrier } from "./types"
-import { GelDeliveryService } from "./providers/gel/GelDeliveryService"
+import { GelDeliveryService } from "./providers/gel/gel-delivery-service"
 
 export class DeliveryFactory {
     static create(carrier: Carrier): DeliveryService {

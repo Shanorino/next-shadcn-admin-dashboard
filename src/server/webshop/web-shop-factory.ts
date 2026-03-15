@@ -1,5 +1,5 @@
-import { WebShopService } from "./WebShopService"
-import { AmazonWebShopService } from "./providers/amazon/AmazonWebShopService"
+import { WebShopService } from "./web-shop-service"
+import { AmazonWebShopService } from "./providers/amazon/amazon-web-shop-service"
 
 export type WebShopProvider = "amazon" | "ebay" | "shopify"
 

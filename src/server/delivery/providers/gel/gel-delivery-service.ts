@@ -1,4 +1,4 @@
-import { DeliveryService } from "../../DeliveryService"
+import { DeliveryService } from "../../delivery-service"
 import {
     CreateDeliveryOrderParams,
     DeliveryResult

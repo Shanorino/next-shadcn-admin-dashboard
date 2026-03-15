@@ -1,4 +1,4 @@
-import { GelDeliveryService } from "@/server/delivery/providers/gel/GelDeliveryService"
+import { GelDeliveryService } from "@/server/delivery/providers/gel/gel-delivery-service"
 import { db } from "@/db";
 import { readFile } from "node:fs/promises"
 

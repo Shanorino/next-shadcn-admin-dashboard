@@ -1,6 +1,6 @@
 import {AmazonConfig, AmazonOrder} from "./types"
 import { SellingPartner } from "amazon-sp-api"
-import { WebShopOrderDTO, WebShopService } from "@/server/webshop/WebShopService";
+import { WebShopOrderDTO, WebShopService } from "@/server/webshop/web-shop-service";
 
 export class AmazonWebShopService extends WebShopService {
     private spClient: SellingPartner
